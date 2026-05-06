@@ -19,7 +19,7 @@
 - 探查 SP11 IronPython 脚本 API
 
 这使得 AI 可以像有经验的 PLC 工程师一样，端到端地完成整个自动化工程的开发。
-
+推荐使用claude code Sonnet 4.6或更智能模型
 ---
 
 ## 运行要求
