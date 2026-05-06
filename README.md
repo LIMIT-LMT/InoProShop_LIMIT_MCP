@@ -1,0 +1,2 @@
+# InoProShop_LIMIT_MCP
+AI可用的汇川InoProShop_MCP
