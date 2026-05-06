@@ -1,5 +1,10 @@
 # InoProShop LIMIT MCP
 
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
+![InoProShop](https://img.shields.io/badge/InoProShop-V1.9.1.6-green)
+![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
+
 > 让 Claude AI 直接操控汇川 InoProShop，实现 PLC 程序的 AI 自动编程。
 >
 > Empower Claude AI to directly control Inovance InoProShop for AI-driven PLC programming automation.
@@ -35,7 +40,7 @@
 
 ## 快速配置（Claude Code）
 
-将以下配置写入 `~/.mcp.json`（`%USERPROFILE%\.mcp.json`）：
+将以下配置写入 `~/.mcp.json`（`%USERPROFILE%\\.mcp.json`）：
 
 ```json
 {
@@ -115,6 +120,34 @@
 
 ---
 
+## 使用建议
+
+### 推荐工作流程
+
+1. **先用 `get_project_structure` 了解项目全貌**，再开始修改，避免重复创建或路径错误。
+2. **写代码前先用 `get_pou_code` 读取现有内容**，在原有基础上修改，不要直接覆盖。
+3. **每完成一个模块立即 `save_project`**，InoProShop 崩溃不会自动恢复。
+4. **用 `compile_project` 验证每次改动**，错误信息直接定位到行号和对象名。
+
+### 硬件项目注意事项
+
+- `create_project` 创建的是软仿真项目（PLCWinNT），**无法添加 EtherCAT 设备**。
+- 需要 EtherCAT/伺服设备时，请以含 AM600 硬件控制器的项目为基础（`Device [type=4102]` 节点下才有 EtherCAT 插槽）。
+- 添加设备前先查 `devicecache.xml` 确认 type / id / version，或用 `probe_api` 探查已有节点结构。
+
+### ST 编程建议
+
+- 上升沿触发指令（MC_MoveAbsolute 等）的 Execute 必须用 R_TRIG 产生脉冲，不能保持 TRUE。
+- Acceleration / Deceleration 参数必须 > 0，否则编译通过但运行报错。
+- 轴对象（AXIS_REF_SM3）在功能块间传递必须用 `VAR_IN_OUT`，不能用 `VAR_INPUT`。
+- MC_Stop 在 SP11 中没有 Done/Error 输出参数，只有 Busy 和 ErrorID。
+
+### probe_api 调试技巧
+
+当工具行为不符合预期时，用 `probe_api` 的 `custom` 模式直接执行 IronPython 脚本探查内部状态，例如读取节点属性、遍历子对象等，有助于快速定位问题。
+
+---
+
 ## 已知不支持项
 
 以下功能受限于 SP11 脚本 API，暂无法通过 MCP 实现：
@@ -161,7 +194,7 @@ This enables AI to complete end-to-end PLC automation projects like an experienc
 
 ## Quick Setup (Claude Code)
 
-Add the following to `~/.mcp.json` (`%USERPROFILE%\.mcp.json`):
+Add the following to `~/.mcp.json` (`%USERPROFILE%\\.mcp.json`):
 
 ```json
 {
@@ -238,6 +271,34 @@ Add the following to `~/.mcp.json` (`%USERPROFILE%\.mcp.json`):
 | Tool | Description |
 |------|-------------|
 | `probe_api` | Probe the SP11 IronPython API (modes: dir / children / connectors / custom) |
+
+---
+
+## Usage Tips
+
+### Recommended Workflow
+
+1. **Start with `get_project_structure`** to understand the project layout before making changes.
+2. **Read before writing** — use `get_pou_code` to see existing code before overwriting it.
+3. **Save frequently** with `save_project` — InoProShop does not auto-recover on crash.
+4. **Compile after every change** with `compile_project` to get line-accurate error messages.
+
+### Hardware Project Notes
+
+- `create_project` generates a software simulation project (PLCWinNT) — **EtherCAT devices cannot be added** to it.
+- For EtherCAT / servo projects, start from an existing AM600 hardware project (a `Device [type=4102]` node is required for EtherCAT slots).
+- Check `devicecache.xml` for the correct type / id / version before calling `add_device`, or use `probe_api` to inspect existing node structure.
+
+### ST Programming Tips
+
+- Execute-triggered FBs (e.g. `MC_MoveAbsolute`) require a rising edge pulse via `R_TRIG` — holding Execute = TRUE only fires once.
+- `Acceleration` and `Deceleration` must always be > 0 or a runtime error will occur.
+- Axis objects (`AXIS_REF_SM3`) must be passed via `VAR_IN_OUT` — using `VAR_INPUT` copies the struct and breaks communication.
+- `MC_Stop` in SP11 has no `Done` or `Error` output — only `Busy` and `ErrorID`.
+
+### probe_api Debug Tips
+
+When tool behavior is unexpected, use `probe_api` in `custom` mode to execute IronPython scripts directly against the open project — useful for reading node properties, enumerating children, or verifying internal state.
 
 ---
 
