@@ -132,7 +132,7 @@
 ### 硬件项目注意事项
 
 - `create_project` 创建的是软仿真项目（PLCWinNT），**无法添加 EtherCAT 设备**。
-- 需要 EtherCAT/伺服设备时，请以含 AM600 硬件控制器的项目为基础（`Device [type=4102]` 节点下才有 EtherCAT 插槽）。
+- 需要 EtherCAT/伺服设备时，请以含硬件控制器的项目为基础（`Device [type=4102]` 节点下才有 EtherCAT 插槽）。
 - 添加设备前先查 `devicecache.xml` 确认 type / id / version，或用 `probe_api` 探查已有节点结构。
 
 ### ST 编程建议
@@ -320,4 +320,4 @@ Inovance AM400 / AM500 / AM600 series mid-range PLCs with InoProShop V1.9.1.6.
 
 ## License
 
-MIT
+LIMINGTONG
